@@ -5,6 +5,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <title>belajar GIS</title>
     <style >
@@ -14,6 +15,7 @@
         background-color: gray;
       }
     </style>
+
   </head>
   <body>
 
@@ -22,33 +24,40 @@
     <div id="map"></div>
 
     <script>
-      var map ;
-      function initMap() {
-        // var location = {lat:-0.450198,lng:117.171575};
-        map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 2,
-          center: new google.maps.LatLng(-0.450198,117.171575),
-          mapTypeId:'terrain'
+      function initMap(){
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat:35.963900, lng: 139.206662},
+          zoom: 6
         });
 
-        // Create a <script> tag and set the USGS URL as the source.
-        var script = document.createElement('script');
+        var infoWindow = new google.maps.InfoWindow({map:map});
 
-        script.src = 'https://developers.google.com/maps/documentation/javascript/examples/json/earthquake_GeoJSONP.js';
-        document.getElementsByTagName('head')[0].appendChild(script);
-      }
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat : position.coords.latitude,
+              lng : position.coords.longitude
+            };
 
-      window.eqfeed_callback = function(results) {
-        for(var i = 0; i < results.features.length; i++){
-          var coords = results.features[i].geometry.coordinates;
-          var latLng = new google.maps.LatLng(coords[1],coords[0]);
-          var marker = new google.maps.Marker({
-            position: latLng,
-            map : map
+            infoWindow.setPosition(pos);
+            infoWindow.setContent('lokasi di temukan.');
+            map.setCenter(pos);
+          }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
           });
+        } else {
+          handleLocationError(true, infoWindow, map.getCenter());
         }
       }
+
+      function handleLocationError(browserHasGeolocation, infoWindow, pos){
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+                                'Error: The Geolocation service failed.' :
+                                'Error: Your browser doesn\'t support geolocation.');
+      }
     </script>
+
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAzP0NCqUJhmbTCFFr6FX70s2e8otBqQFA&callback=initMap"
   type="text/javascript">
     </script>
